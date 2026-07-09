@@ -1,19 +1,14 @@
 #include <SDL.h>
 #include <iostream>
 
+#include "core/Map.hpp"
+#include "game/Renderer.hpp"
+
 namespace {
 
 constexpr int kWindowWidth = 800;
 constexpr int kWindowHeight = 600;
 constexpr int kFramesToRun = 60;
-
-// Clears the screen to a solid color so we have something to look at before
-// any real rendering exists. This will be replaced in later iterations.
-void renderFrame(SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 30, 30, 40, 255);
-    SDL_RenderClear(renderer);
-    SDL_RenderPresent(renderer);
-}
 
 } // namespace
 
@@ -40,6 +35,9 @@ int main() {
         return 1;
     }
 
+    core::Map map("maps/demo1.txt");
+    game::Renderer gameRenderer(renderer, kWindowWidth, kWindowHeight);
+
     bool quit = false;
     for (int frame = 0; frame < kFramesToRun && !quit; ++frame) {
         SDL_Event event;
@@ -48,7 +46,7 @@ int main() {
                 quit = true;
             }
         }
-        renderFrame(renderer);
+        gameRenderer.drawMinimap(map);
     }
 
     SDL_DestroyRenderer(renderer);
