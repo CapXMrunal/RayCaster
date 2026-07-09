@@ -1,5 +1,4 @@
 #include <SDL.h>
-#include <cstdlib>
 #include <iostream>
 
 namespace {
@@ -16,34 +15,9 @@ void renderFrame(SDL_Renderer* renderer) {
     SDL_RenderPresent(renderer);
 }
 
-// Dumps the current back buffer to a BMP file so we can inspect a headless
-// run's output. SDL_SaveBMP needs no extra dependency beyond SDL2 itself.
-bool saveScreenshot(SDL_Renderer* renderer, const char* path) {
-    SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormat(
-        0, kWindowWidth, kWindowHeight, 32, SDL_PIXELFORMAT_RGBA32);
-    if (!surface) {
-        std::cerr << "SDL_CreateRGBSurfaceWithFormat failed: " << SDL_GetError() << "\n";
-        return false;
-    }
-    if (SDL_RenderReadPixels(renderer, nullptr, SDL_PIXELFORMAT_RGBA32,
-                              surface->pixels, surface->pitch) != 0) {
-        std::cerr << "SDL_RenderReadPixels failed: " << SDL_GetError() << "\n";
-        SDL_FreeSurface(surface);
-        return false;
-    }
-    bool ok = SDL_SaveBMP(surface, path) == 0;
-    if (!ok) {
-        std::cerr << "SDL_SaveBMP failed: " << SDL_GetError() << "\n";
-    }
-    SDL_FreeSurface(surface);
-    return ok;
-}
-
 } // namespace
 
-int main(int argc, char** argv) {
-    const char* screenshotPath = argc > 1 ? argv[1] : nullptr;
-
+int main() {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         std::cerr << "SDL_Init failed: " << SDL_GetError() << "\n";
         return 1;
@@ -75,10 +49,6 @@ int main(int argc, char** argv) {
             }
         }
         renderFrame(renderer);
-    }
-
-    if (screenshotPath) {
-        saveScreenshot(renderer, screenshotPath);
     }
 
     SDL_DestroyRenderer(renderer);
